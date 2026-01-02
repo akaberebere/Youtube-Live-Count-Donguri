@@ -6,6 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const saveSoundBtn = document.getElementById('saveSound');
   const testSoundBtn = document.getElementById('testSound');
 
+  // 通信リフレッシュ要求（エラー回避策）
+  function safeRefresh() {
+    chrome.runtime.sendMessage({ action: "refresh" }, () => {
+      if (chrome.runtime.lastError) {
+        setTimeout(safeRefresh, 1000); // 失敗したら1秒後に再試行
+      }
+    });
+  }
+
   chrome.storage.local.get(['targetChannels'], (res) => {
     (res.targetChannels || []).forEach(renderChannel);
   });
@@ -20,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.storage.local.set({ targetChannels: channels }, () => {
           renderChannel(name);
           input.value = '';
-          chrome.runtime.sendMessage({ action: "refresh" });
+          safeRefresh();
         });
       }
     });
@@ -37,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const channels = (res.targetChannels || []).filter(c => c !== name);
         chrome.storage.local.set({ targetChannels: channels }, () => {
           li.remove();
-          chrome.runtime.sendMessage({ action: "refresh" });
+          safeRefresh();
         });
       });
     };
@@ -62,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (res && res.customSound) {
         new Audio(res.customSound).play().catch(() => {});
       } else {
-        alert("通知音が設定されていません。ファイルを保存してからテストしてください。");
+        alert("通知音が設定されていません。");
       }
     });
   };

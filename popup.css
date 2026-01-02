@@ -1,0 +1,87 @@
+body {
+  width: 350px;
+  font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+  margin: 0;
+  padding: 10px;
+  background-color: #f4f4f4;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #ddd;
+}
+
+/* 設定ボタンのデザイン調整 */
+#openOptions {
+  border: 1px solid #ccc;
+  background: #fff;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  color: #555;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+#openOptions:hover {
+  background: #eee;
+  border-color: #bbb;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #555;
+  margin: 15px 0 8px 5px;
+  padding-left: 8px;
+  border-left: 4px solid #cc0000;
+}
+
+.live-item {
+  background: white;
+  border-radius: 8px;
+  padding: 10px;
+  margin-bottom: 10px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.live-item:hover {
+  transform: translateY(-2px);
+  background: #fafafa;
+}
+
+.thumb-img {
+  width: 100%;
+  border-radius: 4px;
+}
+
+.live-title {
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 5px;
+  line-height: 1.4;
+  word-break: break-all;
+  color: #111;
+}
+
+.channel-name {
+  font-size: 11px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.no-live {
+  font-size: 12px;
+  color: #999;
+  text-align: center;
+  padding: 15px;
+  background: #eee;
+  border-radius: 4px;
+}

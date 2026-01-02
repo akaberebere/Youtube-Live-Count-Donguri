@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "YouTube ライブ放送数表示　どんぐりちゃん",
-  "version": "1.0",
+  "version": "1.0.1",
   "permissions": ["alarms", "notifications", "storage", "tabs", "offscreen"],
   "host_permissions": ["https://www.youtube.com/*"],
   "background": {

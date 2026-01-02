@@ -4,6 +4,8 @@
 [ここをクリックしてZipファイルをダウンロード](https://github.com/akaberebere/Youtube-Live-Count-Donguri/archive/refs/heads/main.zip)
 
  <img width="90" height="51" alt="image" src="https://github.com/user-attachments/assets/8eb70704-653d-46d2-9dab-1919a04574d9" />
+
+ 　　　　　
 　　　機能説明
   
 
@@ -67,8 +69,8 @@ YouTube公式の通知は遅れたり届かなかったりすることがあり�
 　
 
 
-6. 例の欄にチャンネル名「＠どんぐりちゃん」や、7. キーワード「どんぐりゲーム」など入力して追加ボタンを押し
-7. 一番下の赤い「設定を保存」ボタンを押してください。
+6. 設定ボタンを押し、追加ボタンの左欄にチャンネル名「＠どんぐりちゃん」or　キーワード「どんぐりゲーム」など入力して追加ボタンを押して
+8. 一番下の赤い「設定を保存」ボタンを押してください。
 　
 　<img width="596" height="597" alt="image" src="https://github.com/user-attachments/assets/127caa9a-de1e-4496-80bd-9ba897c00851" />
 

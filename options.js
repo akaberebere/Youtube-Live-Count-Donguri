@@ -1,78 +1,65 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById('channelName');
-  const addBtn = document.getElementById('add');
-  const list = document.getElementById('list');
-  const soundInput = document.getElementById('soundFile');
-  const saveSoundBtn = document.getElementById('saveSound');
-  const testSoundBtn = document.getElementById('testSound');
+let targetChannels = [];
+let customSound = null;
 
-  // 通信リフレッシュ要求（エラー回避策）
-  function safeRefresh() {
-    chrome.runtime.sendMessage({ action: "refresh" }, () => {
-      if (chrome.runtime.lastError) {
-        setTimeout(safeRefresh, 1000); // 失敗したら1秒後に再試行
-      }
-    });
-  }
-
-  chrome.storage.local.get(['targetChannels'], (res) => {
-    (res.targetChannels || []).forEach(renderChannel);
+function renderList() {
+  const listEl = document.getElementById("channel-list");
+  listEl.innerHTML = targetChannels.length === 0 ? '<div style="padding:15px; color:#999;">リストが空です</div>' : "";
+  targetChannels.forEach((channel, index) => {
+    const div = document.createElement("div");
+    div.className = "list-item";
+    div.innerHTML = `<span>${channel}</span><button class="del-btn" data-index="${index}">削除</button>`;
+    listEl.appendChild(div);
   });
+}
 
-  addBtn.onclick = () => {
-    const name = input.value.trim();
-    if (!name) return;
-    chrome.storage.local.get(['targetChannels'], (res) => {
-      const channels = res.targetChannels || [];
-      if (!channels.includes(name)) {
-        channels.push(name);
-        chrome.storage.local.set({ targetChannels: channels }, () => {
-          renderChannel(name);
-          input.value = '';
-          safeRefresh();
-        });
-      }
-    });
-  };
+document.getElementById("add-btn").addEventListener("click", () => {
+  const input = document.getElementById("new-channel");
+  const val = input.value.trim();
+  if (val && !targetChannels.includes(val)) { targetChannels.push(val); input.value = ""; renderList(); }
+});
 
-  function renderChannel(name) {
-    const li = document.createElement('li');
-    li.textContent = name;
-    const btn = document.createElement('button');
-    btn.textContent = '削除';
-    btn.className = 'remove-btn';
-    btn.onclick = () => {
-      chrome.storage.local.get(['targetChannels'], (res) => {
-        const channels = (res.targetChannels || []).filter(c => c !== name);
-        chrome.storage.local.set({ targetChannels: channels }, () => {
-          li.remove();
-          safeRefresh();
-        });
-      });
-    };
-    li.appendChild(btn);
-    list.appendChild(li);
+document.getElementById("channel-list").addEventListener("click", (e) => {
+  if (e.target.classList.contains("del-btn")) {
+    targetChannels.splice(e.target.getAttribute("data-index"), 1);
+    renderList();
   }
+});
 
-  saveSoundBtn.onclick = () => {
-    const file = soundInput.files[0];
-    if (!file) return alert("ファイルを選択してください");
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      chrome.storage.local.set({ customSound: e.target.result }, () => {
-        alert("通知音を保存しました！");
-      });
-    };
-    reader.readAsDataURL(file);
-  };
+document.getElementById("sound-file").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => { customSound = ev.target.result; };
+  reader.readAsDataURL(file);
+});
 
-  testSoundBtn.onclick = () => {
-    chrome.storage.local.get(['customSound'], (res) => {
-      if (res && res.customSound) {
-        new Audio(res.customSound).play().catch(() => {});
-      } else {
-        alert("通知音が設定されていません。");
-      }
-    });
+document.getElementById("save").addEventListener("click", () => {
+  const data = { 
+    targetChannels, 
+    enableNotify: document.getElementById("enable-notify").checked,
+    notifySeconds: parseInt(document.getElementById("notify-seconds").value) || 5
   };
+  if (customSound) data.customSound = customSound;
+  chrome.storage.local.set(data, () => {
+    document.getElementById("status").textContent = "保存しました！";
+    setTimeout(() => { document.getElementById("status").textContent = ""; }, 2000);
+    chrome.runtime.sendMessage({ action: "forceRefresh" });
+  });
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  chrome.storage.local.get(["targetChannels", "customSound", "enableNotify", "notifySeconds"], (res) => {
+    if (res.targetChannels) { targetChannels = res.targetChannels; renderList(); }
+    if (res.customSound) customSound = res.customSound;
+    document.getElementById("enable-notify").checked = res.enableNotify !== false;
+    document.getElementById("notify-seconds").value = res.notifySeconds || 5;
+  });
+});
+
+document.getElementById("test-sound").addEventListener("click", () => {
+  if (customSound) {
+    chrome.runtime.sendMessage({ type: "play-sound", data: customSound });
+  } else {
+    alert("音声ファイルを選択してください。");
+  }
 });

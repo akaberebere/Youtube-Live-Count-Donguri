@@ -4,119 +4,116 @@ chrome.runtime.onInstalled.addListener(() => {
 
 async function checkLiveChannels() {
   try {
-    const resData = await chrome.storage.local.get(['targetChannels', 'notifiedVideoIds']);
+    const resData = await chrome.storage.local.get(["targetChannels", "notifiedVideoIds", "customSound", "enableNotify", "notifySeconds"]);
     const targets = resData.targetChannels || [];
     let notifiedVideoIds = resData.notifiedVideoIds || [];
+    const liveChannelsInfo = [];
+    const currentLiveVideoIds = [];
 
-    if (targets.length === 0) {
-      chrome.action.setBadgeText({ text: "" });
-      return;
+    const handleTargets = targets.filter(t => t.startsWith("@"));
+    const keywordTargets = targets.filter(t => !t.startsWith("@"));
+
+    // 1. 登録チャンネル(@)を優先チェック
+    for (const keyword of handleTargets) {
+      try {
+        const url = `https://www.youtube.com/${keyword}/live`;
+        const response = await fetch(url);
+        const html = await response.text();
+
+        // 判定条件を「いずれかが含まれていればOK」に広げて安定させる
+        const hasLiveFlag = html.includes('"isLive":true') || html.includes('LIVE_NOW') || html.includes('"style":"LIVE"');
+        const isUpcoming = html.includes('"isUpcoming":true'); // 待機所
+        
+        // ライブフラグがあり、かつ「待機所」ではない場合のみ採用
+        if (!hasLiveFlag || isUpcoming) continue;
+
+        const videoId = extractFirst(html, /"videoId":"([^"]+)"/);
+        if (!videoId) continue;
+
+        const name = extractFirst(html, /"ownerChannelName":"([^"]+)"/) || extractFirst(html, /"author":"([^"]+)"/) || keyword;
+        const title = extractFirst(html, /"title":\{"runs":\[\{"text":"([^"]+)"\}\]/) || "ライブ配信中";
+
+        pushLive({ searchKey: keyword, videoId, title, name }, liveChannelsInfo, currentLiveVideoIds, notifiedVideoIds, resData);
+      } catch (e) { console.error(e); }
     }
 
-    let liveChannelsInfo = [];
-    let currentLiveVideoIds = [];
-    let newNotifiedIds = [...notifiedVideoIds];
-
-    for (const idOrName of targets) {
+    // 2. キーワード検索（ここでは重複を厳格にチェック）
+    for (const keyword of keywordTargets) {
       try {
-        const searchQuery = idOrName.startsWith('@') ? idOrName : `"${idOrName}"`;
-        const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(searchQuery)}&sp=EgJAAQ%253D%253D`;
-
+        const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(keyword)}&sp=EgJAAQ%253D%253D`;
         const response = await fetch(url);
-        const text = await response.text();
+        const html = await response.text();
 
-        // ページ全体に「ライブ」に関する何らかの記述があるか
-        if (!(text.includes('LIVE') || text.includes('ライブ') || text.includes('isLive'))) continue;
+        const blocks = html.split('"videoRenderer":{');
+        for (let i = 1; i < blocks.length; i++) {
+          const block = blocks[i].substring(0, 10000);
+          // キーワード検索は誤判定が多いので、ここは厳しめに「LIVE」の文字を探す
+          if (!block.includes('"style":"LIVE"') && !block.includes("LIVE_NOW")) continue;
 
-        const videoMatches = [...text.matchAll(/"videoId":"([^"]+)"/g)];
-        
-        for (const match of videoMatches) {
-          const videoId = match[1];
-          if (currentLiveVideoIds.includes(videoId)) continue;
+          const videoId = extractFirst(block, /"videoId":"([^"]+)"/);
+          if (!videoId || currentLiveVideoIds.includes(videoId)) continue;
 
-          const pos = text.indexOf(videoId);
-          const nearText = text.substring(Math.max(0, pos - 2000), pos + 5000); 
-
-          // 1. アーカイブ除外：再生時間（長さ）のラベルがあるものは即座にパス
-          const durationPattern = /"lengthText":\{"accessibility":\{"accessibilityData":\{"label":"(\d+分\d+秒|\d+時間\d+分|\d+秒)"\}/;
-          if (durationPattern.test(nearText)) continue;
-
-          // 2. ライブ判定：isLiveフラグ、または「ライブ配信中」のテキスト、または「STYLE_TYPE_LIVE_NOW」のいずれかがあればOK
-          const isLive = nearText.includes('"isLive":true') || 
-                         nearText.includes('ライブ配信中') || 
-                         nearText.includes('STYLE_TYPE_LIVE_NOW') ||
-                         nearText.includes('BADGE_STYLE_TYPE_LIVE_NOW');
-          
-          if (!isLive) continue;
-          
-          // 3. 配信予定（Upcoming）は除外
-          if (nearText.includes('upcomingEventData')) continue;
-
-          // タイトル抽出
-          let titleText = "";
-          const titleSectionMatch = nearText.match(/"title":\{"runs":\[(.*?BasicColorText.*?|.*?)\]\}/);
-          if (titleSectionMatch) {
-            const runMatches = [...titleSectionMatch[1].matchAll(/"text":"(.*?)"/g)];
-            titleText = runMatches.map(m => m[1]).join('').replace(/\\u([0-9a-fA-F]{4})/g, (m, g) => String.fromCharCode(parseInt(g, 16))).replace(/\\/g, '');
+          let name = "配信者";
+          const byline = block.match(/"longBylineText":\{(.*?)\},"/);
+          if (byline) {
+            const texts = [...byline[1].matchAll(/"text":"([^"]+)"/g)];
+            if (texts.length) name = texts.map(t => t[1]).join("");
           }
-
-          // 照合ロジック：@を除いた名前でも一致とみなす
-          const cleanTarget = idOrName.startsWith('@') ? idOrName.substring(1) : idOrName;
-          const isMatch = titleText.includes(cleanTarget) || nearText.includes(cleanTarget);
+          const title = extractFirst(block, /"title":\{"runs":\[\{"text":"([^"]+)"\}\]/) || "配信中";
           
-          if (!isMatch) continue;
-
-          const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
-          const thumbUrl = `https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`;
-
-          liveChannelsInfo.push({ 
-            name: idOrName, 
-            title: titleText || "ライブ配信中",
-            url: watchUrl, 
-            thumb: thumbUrl,
-            videoId: videoId
-          });
-          currentLiveVideoIds.push(videoId);
-
-          if (!newNotifiedIds.includes(videoId)) {
-            newNotifiedIds.push(videoId);
-            chrome.notifications.create(watchUrl, {
-              type: "image",
-              iconUrl: "icon.png",
-              title: idOrName,
-              message: titleText,
-              imageUrl: thumbUrl,
-              priority: 2
-            });
-            playNotificationSound();
-          }
+          pushLive({ searchKey: keyword, videoId, title, name }, liveChannelsInfo, currentLiveVideoIds, notifiedVideoIds, resData);
         }
       } catch (e) { console.error(e); }
     }
 
-    const finalNotifiedList = newNotifiedIds.filter(id => currentLiveVideoIds.includes(id) || notifiedVideoIds.includes(id));
-    await chrome.storage.local.set({ liveChannelsInfo, notifiedVideoIds: finalNotifiedList });
-    chrome.action.setBadgeText({ text: liveChannelsInfo.length > 0 ? liveChannelsInfo.length.toString() : "" });
+    await chrome.storage.local.set({ liveChannelsInfo, notifiedVideoIds });
+    chrome.action.setBadgeText({ text: liveChannelsInfo.length > 0 ? String(liveChannelsInfo.length) : "" });
   } catch (e) { console.error(e); }
 }
 
-async function playNotificationSound() {
-  try {
-    const contexts = await chrome.runtime.getContexts({ contextTypes: ['OFFSCREEN_DOCUMENT'] });
-    if (contexts.length === 0) {
-      await chrome.offscreen.createDocument({
-        url: 'offscreen.html', reasons: ['AUDIO_PLAYBACK'], justification: 'notification'
+function pushLive(base, liveChannelsInfo, currentLiveVideoIds, notifiedVideoIds, settings) {
+  const info = {
+    searchKey: base.searchKey,
+    name: decode(base.name),
+    title: decode(base.title),
+    videoId: base.videoId,
+    url: `https://www.youtube.com/watch?v=${base.videoId}`,
+    thumb: `https://i.ytimg.com/vi/${base.videoId}/mqdefault.jpg`
+  };
+  liveChannelsInfo.push(info);
+  currentLiveVideoIds.push(base.videoId);
+
+  if (!notifiedVideoIds.includes(base.videoId)) {
+    notifiedVideoIds.push(base.videoId);
+    if (settings.enableNotify !== false) {
+      chrome.notifications.create(base.videoId, {
+        type: "basic", iconUrl: "icon.png", title: `ライブ開始: ${info.name}`, message: info.title, priority: 2
       });
+      const ms = (settings.notifySeconds || 5) * 1000;
+      setTimeout(() => { chrome.notifications.clear(base.videoId); }, ms);
     }
-    chrome.runtime.sendMessage({ type: 'play-sound', target: 'offscreen' }).catch(() => {});
+    if (settings.customSound) playNotificationSound(settings.customSound);
+  }
+}
+
+async function playNotificationSound(customSound) {
+  try {
+    const ctx = await chrome.runtime.getContexts({ contextTypes: ["OFFSCREEN_DOCUMENT"] });
+    if (ctx.length === 0) {
+      await chrome.offscreen.createDocument({ url: "offscreen.html", reasons: ["AUDIO_PLAYBACK"], justification: "notification" });
+    }
+    chrome.runtime.sendMessage({ type: "play-sound", data: customSound });
   } catch (e) {}
 }
 
-chrome.notifications.onClicked.addListener((id) => {
-  if (id.startsWith('http')) { chrome.tabs.create({ url: id }); chrome.notifications.clear(id); }
-});
+function extractFirst(text, regex) { const m = text.match(regex); return m ? m[1] : null; }
+function decode(str) { 
+  if (!str) return "";
+  return str.replace(/\\u0026/g, "&").replace(/\\/g, "").split('","')[0].split('"}')[0]; 
+}
 
-chrome.alarms.onAlarm.addListener(a => { if(a.name === "checkLive") checkLiveChannels(); });
-chrome.runtime.onMessage.addListener((m, sender, sendResponse) => {
-  if (m.action === "refresh") { checkLiveChannels().then(() => sendResponse({status: "done"})); return true; }
+chrome.notifications.onClicked.addListener((id) => { chrome.tabs.create({ url: `https://www.youtube.com/watch?v=${id}` }); });
+chrome.alarms.onAlarm.addListener(a => { if (a.name === "checkLive") checkLiveChannels(); });
+chrome.runtime.onMessage.addListener((req, s, send) => {
+  if (req.action === "forceRefresh") { checkLiveChannels().then(() => send({ success: true })); return true; }
 });

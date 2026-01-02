@@ -1,45 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <title>設定 - どんぐりちゃん</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; width: 350px; background: #f9f9f9; }
-    h3 { border-left: 4px solid #ff4444; padding-left: 8px; font-size: 16px; margin: 15px 0 10px; }
-    .input-group { display: flex; gap: 5px; margin-bottom: 10px; }
-    input[type="text"] { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-    ul { list-style: none; padding: 0; }
-    li { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; background: #fff; padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
-    button { cursor: pointer; padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc; background: #fff; }
-    button:hover { background: #eee; }
-    #add { background: #ff4444; color: white; border: none; }
-    .remove-btn { color: #ff0000; border: 1px solid #ff0000; font-size: 11px; }
-    .sound-section { margin-top: 20px; padding-top: 10px; border-top: 2px solid #eee; }
-    .help-text { font-size: 11px; color: #666; margin-bottom: 10px; line-height: 1.4; }
+    body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+    .container { max-width: 850px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; gap: 40px; }
+    .settings-form { flex: 1; }
+    .icon-area { flex: 0 0 200px; text-align: center; position: sticky; top: 20px; }
+    .big-icon { width: 180px; height: 180px; object-fit: contain; }
+    h1 { font-size: 24px; border-bottom: 2px solid #f00; padding-bottom: 10px; }
+    .input-row { display: flex; gap: 8px; margin-bottom: 20px; }
+    input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 6px; }
+    .add-btn { background: #333; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    #channel-list { margin-bottom: 20px; border: 1px solid #eee; border-radius: 8px; }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
+    .del-btn { background: #ff4d4d; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
+    .group { background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #ccc; margin-bottom: 15px; }
+    .save-btn { background: #f00; color: #fff; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; border: none; width: 100%; font-size: 16px; }
+    #status { color: green; font-weight: bold; display: block; text-align: center; margin-top: 10px; }
   </style>
 </head>
 <body>
-  <h3>監視チャンネル設定</h3>
-  <div class="input-group">
-    <input type="text" id="channelName" placeholder="@ハンドル名 または 検索ワード">
-    <button id="add">追加</button>
-  </div>
-  <ul id="list"></ul>
+  <div class="container">
+    <div class="settings-form">
+      <h1>YouTubeライブ配信通知：どんぐりちゃん 設定</h1>
+      <p><b>設定を変更したら一番下の「設定を保存」ボタンを押してね</b></p>
+      <p><b>チェックするチャンネル・キーワード</b></p>
+      <div class="input-row">
+        <input type="text" id="new-channel" placeholder="例: @daifuku_donguri">
+        <button id="add-btn" class="add-btn">追加</button>
+      </div>
+      <div id="channel-list"></div>
 
-  <div class="sound-section">
-    <h3>通知音設定</h3>
-    <p class="help-text">
-      配信開始時に鳴らす音を設定できます（5MBまで）。<br>
-      設定しない場合は「default_sound.mp3」が流れます。
-    </p>
-    <div class="input-group">
-      <input type="file" id="soundFile" accept="audio/*">
+      <div class="group">
+        <label><b>通知音設定</b></label><br>
+        <input type="file" id="sound-file" accept="audio/*" style="margin-top:10px;">
+        <button id="test-sound" style="margin-top:10px; cursor:pointer;">♪ テスト再生</button>
+      </div>
+
+      <div class="group">
+        <label><b>通知の挙動</b></label><br>
+        <div style="margin-top:10px;">
+          <input type="checkbox" id="enable-notify" checked> デスクトップ通知を表示
+        </div>
+        <div style="margin-top:10px;">
+          表示時間: <input type="number" id="notify-seconds" value="5" min="1" max="60" style="width:50px;"> 秒
+        </div>
+      </div>
+
+      <button id="save" class="save-btn">設定を保存</button>
+      <span id="status"></span>
     </div>
-    <div class="input-group">
-      <button id="saveSound">音声を保存</button>
-      <button id="testSound">音声をテスト再生</button>
+    <div class="icon-area">
+      <img src="icon.png" class="big-icon">
+      <h2>どんぐりちゃん</h2>
     </div>
   </div>
-
   <script src="options.js"></script>
 </body>
 </html>

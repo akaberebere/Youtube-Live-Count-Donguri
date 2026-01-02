@@ -1,19 +1,18 @@
-chrome.runtime.onMessage.addListener(async (m) => {
-  if (m.target !== 'offscreen' || m.type !== 'play-sound') return;
-
-  try {
-    // Storage APIが利用可能か、かつ undefined でないか静かにチェック
-    const storage = typeof chrome !== 'undefined' && chrome.storage ? chrome.storage.local : null;
-    
-    if (storage) {
-      const res = await storage.get(['customSound']);
-      // カスタム音声がある場合のみ再生。ない場合は何もせず終了（エラーは出さない）
-      if (res && res.customSound) {
-        const audio = new Audio(res.customSound);
-        await audio.play();
-      }
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.type === "play-sound") {
+    // 1. データが空、または不正な形式（undefinedなど）なら何もしない
+    if (!msg.data) {
+      console.log("再生する音声データがないためスキップしました。");
+      return;
     }
-  } catch (e) {
-    // 再生エラー自体もコンソールを汚さないよう沈黙させる（デバッグ時のみ有効にする場合は console.error(e)）
+
+    try {
+      const audio = new Audio(msg.data);
+      audio.play().catch(e => {
+        console.error("音声の再生に失敗しました（形式不正など）:", e);
+      });
+    } catch (e) {
+      console.error("Audioオブジェクトの作成に失敗しました:", e);
+    }
   }
 });

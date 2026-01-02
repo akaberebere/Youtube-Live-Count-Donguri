@@ -15,7 +15,6 @@ body {
   border-bottom: 2px solid #ddd;
 }
 
-/* 設定ボタンのデザイン調整 */
 #openOptions {
   border: 1px solid #ccc;
   background: #fff;
@@ -25,12 +24,6 @@ body {
   cursor: pointer;
   color: #555;
   border-radius: 4px;
-  transition: all 0.2s;
-}
-
-#openOptions:hover {
-  background: #eee;
-  border-color: #bbb;
 }
 
 .section-title {
@@ -49,12 +42,6 @@ body {
   margin-bottom: 10px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   cursor: pointer;
-  transition: transform 0.1s;
-}
-
-.live-item:hover {
-  transform: translateY(-2px);
-  background: #fafafa;
 }
 
 .thumb-img {
@@ -62,26 +49,42 @@ body {
   border-radius: 4px;
 }
 
+.live-info {
+  margin-top: 8px;
+}
+
 .live-title {
   font-size: 14px;
   font-weight: bold;
-  margin-top: 5px;
   line-height: 1.4;
-  word-break: break-all;
   color: #111;
+  margin-bottom: 8px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.channel-name {
+/* 独立したバッジ表示用のスタイル */
+.badge-container {
+  display: flex;
+  margin-top: 5px;
+}
+
+/* 前回のコードと同じですが、念のため再掲 */
+.channel-name-display {
   font-size: 11px;
-  color: #666;
-  margin-top: 4px;
+  color: #cc0000;
+  font-weight: bold;
+  background: #fff0f0;
+  padding: 2px 10px;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid #ffcccc;
+  margin-top: 5px;
 }
-
-.no-live {
-  font-size: 12px;
-  color: #999;
-  text-align: center;
-  padding: 15px;
-  background: #eee;
-  border-radius: 4px;
-}
+.badge-icon { margin-right: 4px; }
+.live-title { font-size: 14px; font-weight: bold; color: #111; }
+.live-item { background: white; border-radius: 8px; padding: 10px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); cursor: pointer; }
+.thumb-img { width: 100%; border-radius: 4px; }

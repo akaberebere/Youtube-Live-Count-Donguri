@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: sans-serif; padding: 20px; width: 350px; background: #f9f9f9; }
+    h3 { border-left: 4px solid #ff4444; padding-left: 8px; font-size: 16px; margin: 15px 0 10px; }
+    .input-group { display: flex; gap: 5px; margin-bottom: 10px; }
+    input[type="text"] { flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+    ul { list-style: none; padding: 0; }
+    li { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; background: #fff; padding: 8px; border-radius: 4px; border: 1px solid #ddd; }
+    button { cursor: pointer; padding: 6px 12px; border-radius: 4px; border: 1px solid #ccc; background: #fff; }
+    button:hover { background: #eee; }
+    #add { background: #ff4444; color: white; border: none; }
+    .remove-btn { color: #ff0000; border: 1px solid #ff0000; font-size: 11px; }
+    .sound-section { margin-top: 20px; padding-top: 10px; border-top: 2px solid #eee; }
+    .help-text { font-size: 11px; color: #666; margin-bottom: 10px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <h3>監視チャンネル設定</h3>
+  <div class="input-group">
+    <input type="text" id="channelName" placeholder="@ハンドル名 または 検索ワード">
+    <button id="add">追加</button>
+  </div>
+  <ul id="list"></ul>
+
+  <div class="sound-section">
+    <h3>通知音設定</h3>
+    <p class="help-text">
+      配信開始時に鳴らす音を設定できます（5MBまで）。<br>
+      設定しない場合は「default_sound.mp3」が流れます。
+    </p>
+    <div class="input-group">
+      <input type="file" id="soundFile" accept="audio/*">
+    </div>
+    <div class="input-group">
+      <button id="saveSound">音声を保存</button>
+      <button id="testSound">音声をテスト再生</button>
+    </div>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>

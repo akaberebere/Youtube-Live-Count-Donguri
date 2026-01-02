@@ -3,23 +3,12 @@
 ## ダウンロード
 [ここをクリックしてZipファイルをダウンロード](https://github.com/akaberebere/Youtube-Live-Count-Donguri/archive/refs/heads/main.zip)
 
-## 使い方
-1. Zipを解凍します。
-2. Chromeで chrome://extensions/ を開きます。
-3. 「右上」に表示されている「デベロッパーモード」をONにします。
-4. 「展開済み拡張機能を読み込む」から解凍したフォルダを選んでください。
-　
-　
-　<img width="420" height="292" alt="image" src="https://github.com/user-attachments/assets/df97e80e-1d37-40bd-9b48-73d1f2b40062" />
-
-　
-
-
-　
-　
-
-　　
+ <img width="90" height="51" alt="image" src="https://github.com/user-attachments/assets/8eb70704-653d-46d2-9dab-1919a04574d9" />
 　　　機能説明
+  
+
+   
+
 
    
 
@@ -62,3 +51,26 @@ YouTube公式の通知は遅れたり届かなかったりすることがあり�
 あとは待つだけ: ブラウザを開いている間、どんぐりちゃんが休まず巡回します。
 
 さらに使いやすくするためのヒント： 特定の「キーワード」で登録しておくと、そのワードに一致するライブが始まった際にも通知を受け取ることができます。
+
+## 使い方
+1. Zipを解凍します。
+2. Chromeで chrome://extensions/ を開きます。
+3. 「右上」に表示されている「デベロッパーモード」をONにします。
+4. 「展開済み拡張機能を読み込む」から解凍したフォルダを選んでください。
+5. Chrome右上のアイコンクリックすると下の画像のようにポップアップして登録したチャンネルが表示されます。
+　
+
+　
+　
+　<img width="420" height="292" alt="image" src="https://github.com/user-attachments/assets/df97e80e-1d37-40bd-9b48-73d1f2b40062" />
+
+　
+
+
+6. 例の欄にチャンネル名「＠どんぐりちゃん」や、7. キーワード「どんぐりゲーム」など入力して追加ボタンを押し
+7. 一番下の赤い「設定を保存」ボタンを押してください。
+　
+　<img width="596" height="597" alt="image" src="https://github.com/user-attachments/assets/127caa9a-de1e-4496-80bd-9ba897c00851" />
+
+
+　　

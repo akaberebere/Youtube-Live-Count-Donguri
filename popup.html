@@ -14,11 +14,26 @@
     .refresh-btn, .settings-btn { padding: 8px 14px; cursor: pointer; border-radius: 6px; font-size: 13px; font-weight: bold; border: 1px solid #ddd; }
     .refresh-btn { background: #f00; color: #fff; border: none; }
     .refresh-btn:disabled { background: #ccc; }
-    .item { display: flex; gap: 12px; margin-bottom: 12px; text-decoration: none; color: #000; background: #fff; padding: 8px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    
+    /* リストアイテムの調整 */
+    .item-container { position: relative; margin-bottom: 12px; }
+    .item { display: flex; gap: 12px; text-decoration: none; color: #000; background: #fff; padding: 8px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: background 0.2s; }
+    .item:hover { background: #fdfdfd; }
     .thumb { width: 140px; height: 79px; object-fit: cover; border-radius: 4px; }
-    .info { flex: 1; overflow: hidden; }
+    .info { flex: 1; overflow: hidden; padding-right: 25px; } /* ボタン用の余白 */
     .name { font-size: 12px; color: #c00; font-weight: bold; margin-bottom: 4px; }
     .title { font-size: 14px; font-weight: bold; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    
+    /* 消去ボタンのスタイル */
+    .dismiss-btn {
+      position: absolute; top: 8px; right: 8px;
+      width: 24px; height: 24px; border-radius: 50%;
+      border: none; background: #eee; color: #666;
+      font-size: 16px; cursor: pointer; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .dismiss-btn:hover { background: #ddd; color: #000; }
+    
     .empty { color: #999; font-size: 13px; text-align: center; padding: 20px; background: #eee; border-radius: 8px; }
   </style>
 </head>

@@ -13,12 +13,12 @@
     .input-row { display: flex; gap: 8px; margin-bottom: 20px; }
     input[type="text"] { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 6px; }
     .add-btn { background: #333; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    #channel-list { margin-bottom: 20px; border: 1px solid #eee; border-radius: 8px; }
-    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; }
-    .del-btn { background: #ff4d4d; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; }
-    .group { background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #ccc; margin-bottom: 15px; }
-    .save-btn { background: #f00; color: #fff; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; border: none; width: 100%; font-size: 16px; }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; background: #fafafa; margin-bottom: 5px; border-radius: 4px; }
+    .del-btn { background: #ff4d4d; color: #fff; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+    .group { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; }
+    .save-btn { background: #f00; color: #fff; border: none; padding: 15px 40px; border-radius: 30px; font-size: 18px; font-weight: bold; cursor: pointer; display: block; margin: 40px auto 0; width: 100%; }
     #status { color: green; font-weight: bold; display: block; text-align: center; margin-top: 10px; }
+    .info-text { margin-top: 15px; color: #666; font-size: 14px; line-height: 1.6; }
   </style>
 </head>
 <body>
@@ -26,6 +26,7 @@
     <div class="settings-form">
       <h1>YouTubeライブ配信通知：どんぐりちゃん 設定</h1>
       <p><b>設定を変更したら一番下の「設定を保存」ボタンを押してね</b></p>
+      
       <p><b>チェックするチャンネル・キーワード</b></p>
       <div class="input-row">
         <input type="text" id="new-channel" placeholder="例: @daifuku_donguri">
@@ -45,17 +46,21 @@
           <input type="checkbox" id="enable-notify" checked> デスクトップ通知を表示
         </div>
         <div style="margin-top:10px;">
-          表示時間: <input type="number" id="notify-seconds" value="5" min="1" max="60" style="width:50px;"> 秒
+          通知を表示する時間：<input type="number" id="notify-seconds" value="5" style="width:50px;"> 秒
         </div>
       </div>
 
       <button id="save" class="save-btn">設定を保存</button>
-      <span id="status"></span>
+      <div id="status"></div>
     </div>
+
     <div class="icon-area">
-      <img src="icon.png" class="big-icon">
-      <h2>どんぐりちゃん</h2>
-      <h2>2026/01/02 Ver1.0.1 </h2>
+      <img src="icon.png" class="big-icon" alt="icon">
+      <div class="info-text">
+        <p><b>Ver 1.1.0</b></p>
+        <p>最終更新日:<br>2026.04.04</p>
+        <p>開発: どんぐりちゃんチーム</p>
+      </div>
     </div>
   </div>
   <script src="options.js"></script>
